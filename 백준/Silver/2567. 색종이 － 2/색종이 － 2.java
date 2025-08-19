@@ -36,11 +36,7 @@ public class Main {
                     for(int k=0; k<4; k++){
                         int nx = i + dx[k];
                         int ny = j + dy[k];
-                        if(nx<0||ny<0){
-                            cnt++;
-                            continue;
-                        } 
-                        if(board[nx][ny]==0){
+                        if(nx<0||ny<0||board[nx][ny]==0){
                             cnt++;
                         }
 
