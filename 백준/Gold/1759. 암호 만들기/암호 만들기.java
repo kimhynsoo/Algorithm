@@ -5,7 +5,7 @@ public class Main {
     static int L, C;
     static char[] chars;
     static int vowelMask = 0;
-    static List<String> result = new ArrayList<>();
+    static StringBuilder sb;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -30,16 +30,18 @@ public class Main {
         // 조합 생성
         combination(0, 0, new char[L], 0, 0);
 
-        // 결과 출력 (이미 정렬된 상태라 Collections.sort 생략 가능)
-        for(String s : result){
-            System.out.println(s);
-        }
+        
     }
 
     static void combination(int cnt, int start, char[] selected, int vow, int cons){
         if(cnt == L){
+            
             if(vow >= 1 && cons >= 2){
-                result.add(new String(selected)); // 안전하게 추가
+                sb = new StringBuilder();
+                for(char c : selected){
+                    sb.append(c);
+                }
+                System.out.println(sb);
             }
             return;
         }
