@@ -68,15 +68,16 @@ public class Main {
                 }
             }
         }
-
+        StringBuilder sb = new StringBuilder();
         // 모든 노드를 방문했으면 순서 출력
         if(result.size() == N){
             for(int n : result){
-                System.out.println(n);
+                sb.append(n).append("\n");
             }
         } else { 
             // 사이클 발생(모든 가수를 나열할 수 없는 경우)
-            System.out.println(0);
+            sb.append(0);
         }
+        System.out.println(sb);
     }
 }
