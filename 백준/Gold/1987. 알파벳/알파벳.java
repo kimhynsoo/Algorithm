@@ -3,8 +3,8 @@ import java.io.*;
 public class Main {
     static int R,C;
     static char[][] board;
-    static List<Character> visited = new ArrayList<>();
-    static int max =1;
+    static boolean[] visited;
+    static int max =0;
 
     public static void main(String[] args)throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -21,24 +21,24 @@ public class Main {
                 board[i][j] = line.charAt(j);
             }
         }
-        visited.add(board[0][0]);
-        dfs(0, 0);
+        visited = new boolean[26];
+        visited[board[0][0]-'A']=true;
+        dfs(0, 0,1);
         System.out.println(max);
 
 
     }
     static int[] dx = {0,0,1,-1};
     static int[] dy = {1,-1,0,0};
-    static void dfs(int r, int c){
-        
+    static void dfs(int r, int c, int cnt){
+        max = Math.max(cnt, max);
         for(int i=0; i<4; i++){
             int nx = r + dx[i];
             int ny = c + dy[i];
-            if(nx<0 || ny<0 || nx>=R || ny>=C || visited.contains(board[nx][ny])) continue;
-            visited.add(board[nx][ny]);
-            max = Math.max(visited.size(), max);
-            dfs(nx, ny);
-            visited.remove(visited.size()-1);
+            if(nx<0 || ny<0 || nx>=R || ny>=C || visited[board[nx][ny]-'A']) continue;
+            visited[board[nx][ny]-'A']=true;
+            dfs(nx, ny,cnt+1);
+            visited[board[nx][ny]-'A']=false;        
         }
         
     }
