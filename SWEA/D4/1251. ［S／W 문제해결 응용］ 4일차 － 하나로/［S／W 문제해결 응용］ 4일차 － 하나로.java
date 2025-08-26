@@ -9,19 +9,19 @@ import java.util.StringTokenizer;
 
 public class Solution {
     static class island{ //섬의 위치 정보를 저장
-        double x,y; //섬의 좌표 저장
+        long x,y; //섬의 좌표 저장
         island(){};
 
-        double distnace(island o){ //유클리드 공식을 이용한 두 점 사이의 거리를 구하는 메서드
-            return Math.sqrt(Math.pow(this.x-o.x, 2)+Math.pow(this.y-o.y, 2));
+        long distnace(island o){ //유클리드 공식을 이용한 두 점 사이의 거리를 구하는 메서드
+            return (long) (Math.pow(this.x-o.x, 2)+Math.pow(this.y-o.y, 2));
         }
     }
 
     static class Edge implements Comparable<Edge> { //간선의 정보를 저장
         int from,to;
-        double weight;
+        long weight;
 
-        Edge(int from,int to, double weight){
+        Edge(int from,int to, long weight){
             this.from = from;
             this.to = to;
             this.weight = weight;
@@ -30,7 +30,7 @@ public class Solution {
         @Override
         public int compareTo(Edge o) { //가중치를 이용하여 오름차 순 정렬
             // TODO Auto-generated method stub
-            return Double.compare(this.weight, o.weight);
+            return Long.compare(this.weight, o.weight);
         }
         
     
@@ -74,17 +74,23 @@ public class Solution {
             V = Integer.parseInt(br.readLine());
             parents = new int[V];
             make(); //부모 배열 초기화
-            islandList = new island[V];
-            for(int i=0; i<V; i++){ //섬 좌표 배열 초기화.
-                islandList[i] = new island();
-            }
+            // islandList = new island[V];
+            // for(int i=0; i<V; i++){ //섬 좌표 배열 초기화.
+            //     islandList[i] = new island();
+            // }
 
             // 섬들의 x좌표와 y좌표를 각각 입력받음
             StringTokenizer stX = new StringTokenizer(br.readLine());
             StringTokenizer stY = new StringTokenizer(br.readLine());
+            // for(int i=0; i<V; i++){
+            //     islandList[i].x = Integer.parseInt(stX.nextToken());
+            //     islandList[i].y = Integer.parseInt(stY.nextToken());
+            // }
+            Long [] X = new Long[V];
+            Long [] Y = new Long[V];
             for(int i=0; i<V; i++){
-                islandList[i].x = Integer.parseInt(stX.nextToken());
-                islandList[i].y = Integer.parseInt(stY.nextToken());
+                X[i]= Long.parseLong(stX.nextToken());
+                Y[i]= Long.parseLong(stY.nextToken());
             }
             
             E = Double.parseDouble(br.readLine());
@@ -93,8 +99,20 @@ public class Solution {
             // edgeList = new ArrayList<>();
             edgeList = new PriorityQueue<>(); //모든 간선을 저장할 우선 순위 큐 생성
 
-            comb(0, 0); //조합을 이용해 모든 섬들을 쌍으로 묶어 간선을 생성하고 큐에 추가.
+            // comb(0, 0); //조합을 이용해 모든 섬들을 쌍으로 묶어 간선을 생성하고 큐에 추가.
             // Collections.sort(edgeList);
+
+            for(int i=0; i<V; i++){
+                for(int j=i+1; j<V; j++){
+                    long L =(X[i]-X[j])*(X[i]-X[j])+(Y[i]-Y[j])*(Y[i]-Y[j]);
+                    edgeList.offer(new Edge(i, j, L));
+                }
+            }
+
+
+
+
+
             int cnt=0; //선택 된 간선 수
             double total_weight=0; // 총 환경 부담금(MST의 총 가중치)
             int n = V-1; //MST 는 V-1개의 간선으로 구성.
@@ -108,7 +126,7 @@ public class Solution {
                 
                 Edge now =edgeList.poll(); //가장 가중치가 낮은 간선을 꺼냄
                 if(union(now.from,now.to)) { //두섬이 아직 연결되어 있지 않다면
-                    total_weight += now.weight; //해당 간선을 선택하고 비용 누적
+                    total_weight += now.weight*E; //해당 간선을 선택하고 비용 누적
                     if(++cnt==n) break; //다 찾으면 종료
                 }
                 
@@ -124,13 +142,13 @@ public class Solution {
             int from = visited[0];
             int to = visited[1];
             //두섬 사이의 거리
-            double distance = islandList[from].distnace(islandList[to]);
+            long distance = islandList[from].distnace(islandList[to]);
 
-            //두섬 사이의 비용
-            double weight = Math.pow(distance, 2) *E;
+            
+            
 
             //간선 정보를 큐에 추가.
-            edgeList.offer(new Edge(from, to, weight));
+            edgeList.offer(new Edge(from, to, distance));
             return;
         }
         //재귀를 활용한 조합
