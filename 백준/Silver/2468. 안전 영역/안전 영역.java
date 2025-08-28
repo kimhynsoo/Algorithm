@@ -9,7 +9,7 @@ public class Main {
     static int[][] board;
     static int N;
     static boolean[][] visited;
-    static int result=0;
+    static int result=1;
     public static void main(String[] args)throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
