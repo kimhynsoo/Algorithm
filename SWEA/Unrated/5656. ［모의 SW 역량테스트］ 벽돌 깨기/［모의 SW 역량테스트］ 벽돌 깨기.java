@@ -5,7 +5,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class  Solution {
+public class Solution {
     static int N, ROW, COL;
     static int result;
     static int[] dx = {-1, 1, 0, 0};
@@ -32,7 +32,7 @@ public class  Solution {
             }
 
             result = Integer.MAX_VALUE;
-            go(0, board); // 재귀 호출 시작
+            go(0, board); // 재귀 탐색 시작
 
             sb.append("#").append(tc).append(" ").append(result).append("\n");
         }
@@ -40,6 +40,7 @@ public class  Solution {
     }
 
     /**
+     * 백트래킹을 이용한 완전 탐색 함수
      * @param cnt 현재까지 사용한 구슬의 수
      * @param map 현재 상태의 벽돌 맵
      */
@@ -49,32 +50,54 @@ public class  Solution {
             return;
         }
 
-        // [기저 조건] 구슬을 N개 모두 사용했다면
-        if (cnt == N) {
-            // 남은 벽돌 수를 계산하여 최솟값 갱신
-            int remainingBricks = count(map);
-            result = Math.min(result, remainingBricks);
+        int remainingBricks = count(map);
+        // [가지치기 2] 남은 벽돌 개수가 현재까지 찾은 최적의 해보다 크지 않다면 더 이상 탐색 불필요
+        if (remainingBricks == 0) {
+            result = 0;
             return;
         }
 
-        // 모든 열에 대해 구슬을 떨어뜨리는 경우를 시도
+        // [기저 조건] 구슬을 N개 모두 사용했다면 탐색 종료
+        if (cnt == N) {
+            result = Math.min(result, count(map));
+            return;
+        }
+
+        // '빈 열에 쏘는 경우(패스)'를 현재 턴에서 한 번만 처리하기 위한 플래그
+        boolean noOpHandled = false;
+
+        // 모든 열에 구슬을 떨어뜨리는 경우를 시도
         for (int c = 0; c < COL; c++) {
-            // 1. 현재 맵 상태를 깊은 복사하여 다음 시뮬레이션에 사용
-            int[][] nextMap = copy(map);
-            
-            // 2. 해당 열(c)에 구슬을 떨어뜨려 벽돌을 파괴
-            attack(c, nextMap);
-            
-            // 3. 파괴 후 벽돌들을 아래로 정리
-            clean(nextMap);
-            
-            // 4. 다음 구슬을 사용하기 위해 재귀 호출
-            go(cnt + 1, nextMap);
+            // 현재 열에 벽돌이 있는지 확인
+            int topBrickRow = -1;
+            for (int r = 0; r < ROW; r++) {
+                if (map[r][c] != 0) {
+                    topBrickRow = r;
+                    break;
+                }
+            }
+
+            if (topBrickRow == -1) { // 해당 열에 벽돌이 없는 경우 (패스)
+                // '패스' 경우는 어느 빈 열을 선택하든 결과가 동일하므로,
+                // 현재 턴(cnt)에서 딱 한 번만 처리한다.
+                if (!noOpHandled) {
+                    noOpHandled = true;
+                    go(cnt + 1, map); // 구슬만 1개 사용하고, 맵은 그대로 다음 턴으로
+                }
+            } else { // 해당 열에 벽돌이 있는 경우
+                int[][] nextMap = copy(map);
+                attack(c, nextMap);
+                clean(nextMap);
+                go(cnt + 1, nextMap); // 구슬 1개 사용하고, 변경된 맵으로 다음 턴으로
+            }
         }
     }
 
+    // 벽돌 파괴 (BFS)
     static void attack(int col, int[][] temp) {
-        // col 열에서 가장 위 벽돌 찾기
+        Queue<int[]> q = new ArrayDeque<>();
+        
+        // attack 함수 내부에서도 맨 위 벽돌을 찾지만, go 함수 로직의 명확성을 위해 중복 허용
         int row = -1;
         for (int i = 0; i < ROW; i++) {
             if (temp[i][col] != 0) {
@@ -82,12 +105,10 @@ public class  Solution {
                 break;
             }
         }
-        // [가지치기 2] 해당 열에 벽돌이 없으면 아무 일도 일어나지 않음
         if (row == -1) return;
 
-        Queue<int[]> q = new ArrayDeque<>();
         q.offer(new int[]{row, col, temp[row][col]});
-        temp[row][col] = 0; // 시작 벽돌 제거
+        temp[row][col] = 0;
 
         while (!q.isEmpty()) {
             int[] cur = q.poll();
@@ -95,44 +116,37 @@ public class  Solution {
 
             if (power <= 1) continue;
 
-            // 4방향으로 power-1 칸씩 전파
             for (int d = 0; d < 4; d++) {
-                int nx = x;
-                int ny = y;
                 for (int k = 1; k < power; k++) {
-                    nx += dx[d];
-                    ny += dy[d];
-                    if (nx < 0 || ny < 0 || nx >= ROW || ny >= COL) break;
+                    int nx = x + dx[d] * k;
+                    int ny = y + dy[d] * k;
+
+                    if (nx < 0 || ny < 0 || nx >= ROW || ny >= COL) continue;
+                    
                     if (temp[nx][ny] > 0) {
                         q.offer(new int[]{nx, ny, temp[nx][ny]});
-                        temp[nx][ny] = 0; // 큐에 넣으면서 바로 제거 처리
+                        temp[nx][ny] = 0;
                     }
                 }
             }
         }
     }
 
+    // 벽돌 정리 (중력 작용)
     static void clean(int[][] temp) {
         for (int c = 0; c < COL; c++) {
-            // 아래에서부터 살아있는 벽돌을 담을 큐 (또는 스택, 리스트)
-            ArrayDeque<Integer> survivors = new ArrayDeque<>();
-            for (int r = ROW - 1; r >= 0; r--) {
-                if (temp[r][c] > 0) {
-                    survivors.add(temp[r][c]);
+            int write = ROW - 1; // 벽돌을 새로 쓸 위치
+            for (int r = ROW - 1; r >= 0; r--) { // 아래부터 읽는다
+                if (temp[r][c] != 0) {
+                    int val = temp[r][c];
+                    temp[r][c] = 0;
+                    temp[write--][c] = val; // 아래부터 차곡차곡 쓴다
                 }
-            }
-            // 현재 열을 0으로 초기화
-            for (int r = 0; r < ROW; r++) {
-                temp[r][c] = 0;
-            }
-            // 큐에 담아둔 벽돌을 아래부터 다시 채우기
-            int r = ROW - 1;
-            while (!survivors.isEmpty()) {
-                temp[r--][c] = survivors.poll();
             }
         }
     }
     
+    // 2차원 배열 깊은 복사
     static int[][] copy(int[][] original) {
         int[][] temp = new int[ROW][COL];
         for (int i = 0; i < ROW; i++) {
@@ -141,6 +155,7 @@ public class  Solution {
         return temp;
     }
 
+    // 남은 벽돌 개수 세기
     static int count(int[][] temp) {
         int cnt = 0;
         for (int i = 0; i < ROW; i++) {
