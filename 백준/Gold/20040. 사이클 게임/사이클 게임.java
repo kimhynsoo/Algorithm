@@ -1,66 +1,53 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
-
-	static int n, m;
-	static int[] parents;
-	static int result;
-	static boolean check;
-	static int[][] arr;
-	
+	static int [] parents;
+	static int N,M;
 	static void make() {
-		for(int i = 0; i<n; i++) {
-			parents[i] = i;
+		// TODO Auto-generated method stub
+		for(int i=0; i<N; i++) {
+			parents[i]=i;
 		}
 	}
-	
 	static int find(int a) {
-		if(parents[a] == a) return a;
-		return parents[a] = find(parents[a]);
+		if(a==parents[a]) return a;
+		return parents[a]= find(parents[a]);
 	}
 	
 	static boolean union(int a, int b) {
-		int pa = find(a);
-		int pb = find(b);
-		if(pa == pb) return false;
-		if(pa > pb) parents[pb] = pa;
-		else parents[pa] = pb;
+		int aRoot = find(a);
+		int bRoot = find(b);
+		if(aRoot==bRoot) return false;
+		if(aRoot<bRoot) parents[bRoot]=aRoot;
+		else  parents[aRoot]=bRoot;
+		
 		return true;
 	}
-	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException{
+
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		StringBuilder sb = new StringBuilder();
-		
-		st = new StringTokenizer(br.readLine());
-		n = Integer.parseInt(st.nextToken());
-		m = Integer.parseInt(st.nextToken());
-		parents = new int[n];
-		arr = new int[m][2];
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		parents=new int [N];
 		make();
-		check = true;
-		
-		for(int i = 0; i<m; i++) {
+		boolean flag=false;
+		for(int i=0; i<M; i++) {
 			st = new StringTokenizer(br.readLine());
 			int a = Integer.parseInt(st.nextToken());
 			int b = Integer.parseInt(st.nextToken());
-			
-			arr[i][0] = a;
-			arr[i][1] = b;
-		}
-		for(int i = 0; i<m; i++) {
-			if(union(arr[i][0], arr[i][1])) {
-				result++;
-			}else {
-				check = false;
+			if(!union(a, b)) {
+				System.out.println(i+1);
+				flag = true;
 				break;
 			}
 		}
-		if(!check) System.out.println(result+1);
-		else System.out.println(0);
+		if(!flag) System.out.println(0);
 		
+
 	}
 
 }
