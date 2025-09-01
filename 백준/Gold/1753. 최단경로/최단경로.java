@@ -69,6 +69,8 @@ public class Main {
             Edge cur = pq.poll(); 
             int to = cur.to;  // 현재 간선이 향하는 정점
             int weight = cur.weight;
+
+            if(minDist[to]< weight) continue;
             
             // 이미 방문한 정점이면 무시
             if(visited[to]) continue;   
