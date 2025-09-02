@@ -62,7 +62,7 @@ public class Main {
         PriorityQueue<Edge> pq = new PriorityQueue<>(); 
         // 시작 정점의 최단 거리는 0으로 설정하고 큐에 삽입
         pq.offer(new Edge(start, 0));            
-        
+        int cnt =0;
         // 큐가 빌 때까지 반복 (방문하지 않은 정점 중 최단 거리 선택)
         while (!pq.isEmpty()) {
             // 현재 최소 비용의 간선을 꺼냄
@@ -75,6 +75,8 @@ public class Main {
             // 이미 방문한 정점이면 무시
             if(visited[to]) continue;   
             visited[to] = true;  // 방문 처리
+            cnt++;
+            if(cnt==V) break; 
 
             // 현재 정점과 연결된 모든 인접 간선 확인
             for(Edge next : graph[to]){
@@ -89,13 +91,15 @@ public class Main {
         }
 
         // 최종 최단 거리 출력
+        StringBuilder sb = new StringBuilder();
         for(int i = 1; i <= V; i++){
             if(minDist[i] == INF){
-                System.out.println("INF"); // 도달 불가 정점
+                sb.append("INF").append("\n"); // 도달 불가 정점
             } else {
-                System.out.println(minDist[i]); // 최단 거리 출력
+                sb.append(minDist[i]).append("\n"); // 최단 거리 출력
             }
         }
+        System.out.println(sb);
     }
 
 }
