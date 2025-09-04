@@ -10,10 +10,13 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine()); // 집의 크기 (N x N)
 
+
+        
         int map[][] = new int[N][N]; // 집의 상태: 0=빈 칸, 1=벽
 
         // dp[dir][i][j] : 파이프의 끝이 (i,j)에 있고, 방향이 dir일 때 만들 수 있는 방법의 수
         // dir = 0 (가로), 1 (세로), 2 (대각선)
+        //파이프 옮기기 1과 다른 점 정수 범위. int -> long
         long dp[][][] = new long[3][N][N]; 
 
         // 초기 상태: 파이프가 (0,0)~(0,1) 가로 방향으로 놓여 있음
