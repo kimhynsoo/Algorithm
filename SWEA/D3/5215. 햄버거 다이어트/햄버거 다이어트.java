@@ -4,45 +4,59 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Solution {
-    static int N,L;
-    static int score[];
-    static int kcal[];
-    static int max_score =0;
+    static int N, L; // N : 재료의 수, L : 제한 칼로리 
+    
+    // 재료 정보를 저장할 클래스
+    static Info[] infos;
+    static class Info  {
+        int score, kcal; // 점수, 칼로리
+
+        public Info(int score, int kcal) {
+            this.score = score;
+            this.kcal = kcal;
+        }
+    }
+
     public static void main(String[] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int T = Integer.parseInt(br.readLine()); // 테스트 케이스 개수 입력
+        StringTokenizer st;
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        int T = Integer.parseInt(st.nextToken());
-
-        for(int tc = 1 ; tc<=T ; tc ++){
+        for(int tc=1; tc<=T; tc++){
+            // N : 재료 개수, L : 제한 칼로리
             st = new StringTokenizer(br.readLine());
             N = Integer.parseInt(st.nextToken());
             L = Integer.parseInt(st.nextToken());
-            score = new int[N];
-            kcal = new int[N];
+
+            infos = new Info[N];
+
+            // 각 재료의 점수와 칼로리 입력
             for(int i=0; i<N; i++){
                 st = new StringTokenizer(br.readLine());
-                score[i]=Integer.parseInt(st.nextToken());
-                kcal[i] = Integer.parseInt(st.nextToken());
+                int score = Integer.parseInt(st.nextToken());
+                int kcal = Integer.parseInt(st.nextToken());
+                infos[i] = new Info(score, kcal);
             }
-            max_score=0;
-            subset(0, 0, 0);
-            System.out.printf("#%d %d\n",tc,max_score);
+            
+            // dp[j] : 칼로리 합이 j일 때 얻을 수 있는 최대 점수
+            int dp[] = new int[L+1];
 
+            // 0/1 배낭 문제 방식으로 DP 채우기
+            for(int i=0; i<N; i++){
+                int sc = infos[i].score; // 현재 재료 점수
+                int kc = infos[i].kcal;  // 현재 재료 칼로리
+
+                // 뒤에서부터 채우는 이유: 같은 재료를 중복해서 선택하지 않기 위해
+                for(int j=L; j>=kc; j--){
+                    dp[j] = Math.max(dp[j], dp[j-kc] + sc);
+                }
+            }
+
+            // 테스트케이스 결과 출력
+            // 제한 칼로리 L 이하에서 얻을 수 있는 최대 점수는 dp[L]
+            StringBuilder sb = new StringBuilder();
+            sb.append("#").append(tc).append(" ").append(dp[L]);
+            System.out.println(sb);
         }
-
     }
-    static void subset(int index,int sc, int kc){
-        if(kc>L){
-            return;
-        }
-        if(index == N){
-            max_score=Math.max(sc, max_score);
-            return;
-        }
-        subset(index+1, sc, kc);
-        subset(index+1, sc+score[index], kc + kcal[index]);
-    }
-
-
 }
