@@ -29,10 +29,13 @@ public class Main {
 
         for(int i=1; i<=N; i++){
             for(int w =1; w<=K; w++){
-                dp[i][w] = dp[i-1][w];
+
+                
                 if(w>=weight[i]){
 
                     dp[i][w] = Math.max(dp[i-1][w], dp[i-1][w-weight[i]]+value[i]);
+                }else{
+                    dp[i][w] = dp[i-1][w];
                 }
             }
         }
