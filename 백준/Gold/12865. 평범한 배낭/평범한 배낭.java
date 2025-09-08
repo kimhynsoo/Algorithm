@@ -19,35 +19,45 @@ public class Main {
         K = Integer.parseInt(st.nextToken());
         weight = new int[N+1];
         value = new int[N+1];
-        // dp = new int[N+1][K+1];
-
+        
         for(int i=1; i<=N; i++){
             st = new StringTokenizer(br.readLine());
             weight[i] = Integer.parseInt(st.nextToken());
             value[i] = Integer.parseInt(st.nextToken());
         }
+        
 
-        // for(int i=1; i<=N; i++){
-        //     for(int w =1; w<=K; w++){
+
+        System.out.println(dp_2());
+
+    }
+
+    static int dp_1(){
+        int[][] dp = new int[N+1][K+1];
+        for(int i=1; i<=N; i++){
+            for(int w =1; w<=K; w++){
 
                 
-        //         if(w>=weight[i]){
+                if(w>=weight[i]){
 
-        //             dp[i][w] = Math.max(dp[i-1][w], dp[i-1][w-weight[i]]+value[i]);
-        //         }else{
-        //             dp[i][w] = dp[i-1][w];
-        //         }
-        //     }
-        // }
-        // System.out.println(dp[N][K]);
-        int [] dp =new int[K+1];
+                    dp[i][w] = Math.max(dp[i-1][w], dp[i-1][w-weight[i]]+value[i]);
+                }else{
+                    dp[i][w] = dp[i-1][w];
+                }
+            }
+        }
+        return dp[N][K];
+    }
+
+    static int dp_2(){
+        int[] dp = new int[K+1];
+
         for(int i=1; i<=N; i++){
             for(int w=K; w>=weight[i]; w--){
                 dp[w] = Math.max(dp[w], dp[w-weight[i]]+value[i]);
             }
         }
 
-        System.out.println(dp[K]);
-
+        return dp[K];
     }
 }
