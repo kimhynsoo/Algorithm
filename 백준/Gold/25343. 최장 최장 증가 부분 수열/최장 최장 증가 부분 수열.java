@@ -44,7 +44,14 @@ public class Main {
                 ArrayList<Integer> mergedList = merge(top, left);
 
                 // 2. 병합된 LIS 배열에 현재 칸의 값(board[i][j])을 반영하여 업데이트한다.
-                LIS(mergedList, board[i][j]);
+                int lastNum = mergedList.get(mergedList.size()-1);
+                int curNum = board[i][j];
+                if(lastNum < curNum){
+                    mergedList.add(curNum);
+                }else if(lastNum > curNum){
+                    int pos = lower_bound(mergedList, curNum);
+                    mergedList.set(pos, curNum);
+                }
 
                 // 3. 업데이트된 LIS 배열을 현재 칸의 DP 값으로 저장한다.
                 dp[i][j] = mergedList;
@@ -87,21 +94,6 @@ public class Main {
 
         return merged;
     }
-
-
-    static void LIS(ArrayList<Integer> lis, int val) {
-        // lower_bound를 통해 val이 들어갈 위치를 찾는다.
-        int pos = lower_bound(lis, val);
-        
-        // val이 lis의 모든 원소보다 크면, 맨 뒤에 추가하여 길이를 1 늘린다.
-        if (pos == lis.size()) {
-            lis.add(val);
-        } else {
-            // 그렇지 않으면, 해당 위치의 값을 val로 교체한다. 
-            lis.set(pos, val);
-        }
-    }
-
 
     static int lower_bound(ArrayList<Integer> list, int key) {
         int start = 0;
