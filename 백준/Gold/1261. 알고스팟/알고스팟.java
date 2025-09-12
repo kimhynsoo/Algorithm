@@ -21,7 +21,7 @@ public class Main {
             return this.count-o.count;
         }
     }
-    static int visited[][];
+    static boolean visited[][];
     static int board[][];
     static int R,C;
     static int [] dr = {-1,1,0,0};
@@ -33,7 +33,7 @@ public class Main {
         C = Integer.parseInt(st.nextToken());
         R = Integer.parseInt(st.nextToken());
         board = new int[R][C];
-        visited = new int[R][C];
+        visited = new boolean[R][C];
         for(int i=0; i<R; i++){
             String line = br.readLine().trim();
             for(int j=0; j<C; j++){
@@ -45,7 +45,7 @@ public class Main {
 
     static int bfs(){
         PriorityQueue<Pair> q = new PriorityQueue();
-        visited[0][0]=1;
+        visited[0][0]=true;
         q.offer(new Pair(0, 0, 0));
         
         while (!q.isEmpty()) {
@@ -57,8 +57,8 @@ public class Main {
                 int nr= r+dr[d];
                 int nc= c+dc[d];
 
-                if(nr<0 || nc<0 || nr>=R || nc>=C || visited[nr][nc]>0) continue;
-                visited[nr][nc] = visited[r][c]+1;
+                if(nr<0 || nc<0 || nr>=R || nc>=C || visited[nr][nc]) continue;
+                visited[nr][nc] = true;
                 if(board[nr][nc]==1){
                     q.offer(new Pair(nr, nc, cur.count+1 ));
                 }
