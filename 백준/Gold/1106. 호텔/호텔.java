@@ -12,19 +12,22 @@ public class Main {
 
         int [] weights = new int[N];
         int [] values = new int[N];
+        int max=0;
         for(int i=0; i<N; i++){
             st = new StringTokenizer(br.readLine());
             weights[i] = Integer.parseInt(st.nextToken());
             values[i] = Integer.parseInt(st.nextToken());
+            if(weights[i]>max) max = weights[i];
         }
-        int [] dp = new int[100000+1]; //N원일 때 최대 사람
+        max = max*1000;
+        int [] dp = new int[max+1]; //N원일 때 최대 사람
         for(int i=0; i<N; i++){
-            for(int w=weights[i]; w<=100000; w++){
+            for(int w=weights[i]; w<=max; w++){
                 dp[w]=Math.max(dp[w],dp[w-weights[i]]+values[i] );
             }
         }
 
-        for(int i=0; i<=100000; i++){
+        for(int i=0; i<=max; i++){
             if (dp[i]>=C){
                 System.out.println(i);
                 break;
