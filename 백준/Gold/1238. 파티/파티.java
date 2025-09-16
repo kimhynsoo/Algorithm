@@ -26,6 +26,7 @@ public class Main {
     static int[] minDist;
     
     static ArrayList<Edge> adj[];
+    static ArrayList<Edge> reverse_adj[];
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -38,6 +39,10 @@ public class Main {
         for(int i=1; i<=N; i++){
             adj[i] = new ArrayList<>();
         }
+        reverse_adj = new ArrayList[N+1];
+        for(int i=1; i<=N; i++){
+            reverse_adj[i] = new ArrayList<>();
+        }
 
         for(int i=0; i<M; i++){
             st  = new StringTokenizer(br.readLine());
@@ -45,13 +50,15 @@ public class Main {
             int to = Integer.parseInt(st.nextToken());
             int weight = Integer.parseInt(st.nextToken());
             adj[from].add(new Edge(to, weight));
+            reverse_adj[to].add(new Edge(from, weight));
         }
-        dijkstra(X);
+        int []go = dijkstra(X,adj);
+        int []back = dijkstra(X, reverse_adj);
         int max=0;
         for(int i=1; i<=N; i++){
             if(i==X) continue;
 
-            int dist = minDist[i]+dijkstra2(i, X);
+            int dist = go[i]+back[i];
             max = Math.max(max, dist);
         }
 
@@ -59,9 +66,9 @@ public class Main {
 
     }
 
-    static void dijkstra(int start){
+    static int[] dijkstra(int start, ArrayList<Edge>[] list){
         boolean[] visited = new boolean[N+1];
-        minDist = new int[N+1];
+        int []minDist = new int[N+1];
         Arrays.fill(minDist, 1_000_000_000);
         minDist[start]=0;
         PriorityQueue<Edge> pq = new PriorityQueue<>();
@@ -75,7 +82,7 @@ public class Main {
             if(visited[to]) continue;
             visited[to] = true;
 
-            for(Edge next : adj[to]){
+            for(Edge next : list[to]){
                 int nweight = weight+next.weight;
                 if(!visited[next.to] && minDist[next.to]> nweight){
                     minDist[next.to] = nweight;
@@ -85,36 +92,9 @@ public class Main {
             }
             
         }
+
+        return minDist;
     }
 
-    static int dijkstra2(int start, int end){
-        boolean []visited = new boolean[N+1];
-        int []minDist2 = new int[N+1];
-        Arrays.fill(minDist2, 1_000_000_000);
-        minDist2[start]=0;
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.offer(new Edge(start, 0));
-
-        while (!pq.isEmpty()) {
-            Edge cur = pq.poll();
-            int to = cur.to;
-            int weight = cur.weight;
-
-            if(visited[to]) continue;
-            visited[to] = true;
-            if(to==X){
-                return minDist2[to];
-            }
-            for(Edge next : adj[to]){
-                int nweight = weight+next.weight;
-                if(!visited[next.to] && minDist2[next.to]> nweight){
-                    minDist2[next.to] = nweight;
-
-                    pq.offer(new Edge(next.to, nweight));
-                }
-            }
-            
-        }
-        return -1;
-    }
+    
 }
