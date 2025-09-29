@@ -1,7 +1,10 @@
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.PriorityQueue;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
     static class Pair implements Comparable<Pair>{
@@ -14,23 +17,23 @@ public class Main {
 
         @Override
         public int compareTo(Pair o) {
-            if(this.start!=o.start){
-                return this.start-o.start;
+            int cmp = Integer.compare(this.start, o.start);
+            if(cmp==0){
+                cmp = Integer.compare(this.end, o.end);
             }
-            else{
-                return this.end-o.end;
-            }
+            return cmp;
             
         }
         
 
     }
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int N = Integer.parseInt(br.readLine());
         Pair[] list = new Pair[N];
         for(int i=0; i<N; i++){
-            list[i]=new Pair(sc.nextInt(), sc.nextInt());
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            list[i]=new Pair(Integer.parseInt(st.nextToken()),Integer.parseInt(st.nextToken()));
         }
         Arrays.sort(list);
         PriorityQueue<Integer> pq = new PriorityQueue<>();
