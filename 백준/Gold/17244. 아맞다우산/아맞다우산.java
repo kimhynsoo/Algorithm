@@ -86,7 +86,7 @@ public class Main {
                 // 경계 밖 또는 벽은 이동 불가
                 if (nr < 0 || nc < 0 || nr >= R || nc >= C || map[nr][nc] == '#')
                     continue;
-
+                if (visited[nr][nc][mask]) continue;
                 int nextmask = mask;
 
                 // 이동한 위치가 아이템이면 비트마스크 갱신
