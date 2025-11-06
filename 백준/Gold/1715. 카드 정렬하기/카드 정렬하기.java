@@ -14,23 +14,17 @@ public class Main {
         }
 
         int result = 0;
-        // while (!pq.isEmpty()) {
-        // if (pq.size() > 1) {
-        // int a = pq.poll();
-        // int b = pq.poll();
-        // result += a + b;
-        // pq.offer(a + b);
-        // } else {
-        // break;
-        // }
-        // }
+        int a=0;
+        int b=0;
+        while (pq.size() != 1) {
 
-        for (int i = 0; i < N - 1; i++) {
-            int a = pq.poll();
-            int b = pq.poll();
+            a = pq.poll();
+            b = pq.poll();
             result += a + b;
             pq.offer(a + b);
+
         }
+
         System.out.println(result);
     }
 }
