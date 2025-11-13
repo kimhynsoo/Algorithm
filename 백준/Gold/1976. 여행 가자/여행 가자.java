@@ -12,10 +12,12 @@ public class Main {
         if(parent[x]==x)return x;
         return parent[x] = find(parent[x]);
     }
-    static void union(int a,int b){
+    static boolean union(int a,int b){
         a=find(a);
         b=find(b);
-        if(a!=b) parent[b]=a;
+        if(a==b) return false;
+        parent[b]=a;
+        return true;
     }
     static int []parent;
     public static void main(String[] args) throws IOException{
@@ -40,7 +42,7 @@ public class Main {
         int start = Integer.parseInt(st.nextToken());
         for(int i=1; i<M; i++){
             int to =Integer.parseInt(st.nextToken());
-            if(find(start)!=find(to)){
+            if(union(start, to)){
                 System.out.println("NO");
                 return;
             }
