@@ -1,17 +1,15 @@
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.util.Collections;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
     static int[][] graph;
-    static boolean visited[][];
     static int N;
     static int dr[] = { -1, 1, 0, 0 };
     static int dc[] = { 0, 0, -1, 1 };
@@ -32,7 +30,7 @@ public class Main {
 
     }
 
-    static PriorityQueue<Virus> viruses;
+    static Queue<Virus> viruses;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -40,24 +38,28 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         int K = Integer.parseInt(st.nextToken());
         graph = new int[N + 1][N + 1];
-        viruses = new PriorityQueue<>();
+        viruses = new ArrayDeque<>();
+        ArrayList<Virus> init = new ArrayList<>();
         for (int i = 1; i <= N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 1; j <= N; j++) {
                 int num = Integer.parseInt(st.nextToken());
                 graph[i][j] = num;
                 if (num != 0) {
-                    viruses.add(new Virus(i, j, num));
+                    init.add(new Virus(i, j, num));
                 }
             }
         }
+        Collections.sort(init);
+        for (Virus v : init)
+            viruses.offer(v);
 
         st = new StringTokenizer(br.readLine());
         int S = Integer.parseInt(st.nextToken());
         int row = Integer.parseInt(st.nextToken());
         int col = Integer.parseInt(st.nextToken());
         while (S-- > 0) {
-            visited = new boolean[N + 1][N + 1];
+
             bfs();
 
         }
@@ -65,25 +67,24 @@ public class Main {
     }
 
     static void bfs() {
-        ArrayList<Virus> added= new ArrayList<>();
-        while (!viruses.isEmpty()) {
+        int size = viruses.size();
+        while (size-- > 0) {
             Virus cur = viruses.poll();
             int r = cur.r;
             int c = cur.c;
             int v_num = cur.v_num;
-            visited[r][c]=true;
-            for(int d=0; d<4; d++){
-                int nr = r+dr[d];
-                int nc = c+dc[d];
-                if(nr<=0 || nc<=0 || nr>N|| nc>N || visited[nr][nc]|| graph[nr][nc]!=0) continue;
-                visited[nr][nc]=true;
-                graph[nr][nc]=v_num;
-                added.add(new Virus(nr, nc, v_num));
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+                if (nr <= 0 || nc <= 0 || nr > N || nc > N || graph[nr][nc] != 0)
+                    continue;
+
+                graph[nr][nc] = v_num;
+                viruses.offer(new Virus(nr, nc, v_num));
             }
         }
-        for(Virus v : added){
-            viruses.offer(v);
-        }
+
     }
 
 }
