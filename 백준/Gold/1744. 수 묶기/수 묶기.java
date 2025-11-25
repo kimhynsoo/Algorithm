@@ -14,50 +14,50 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
 
-        PriorityQueue<Integer> positive_pq = new PriorityQueue<>((o1, o2) -> {
-            return o2 - o1;
-        });
-        PriorityQueue<Integer> negative_pq = new PriorityQueue<>();
+        ArrayList<Integer> pos = new ArrayList<>();
+        ArrayList<Integer> neg = new ArrayList<>();
+        int zero = 0;
+        int one = 0;
         for (int i = 0; i < N; i++) {
 
             int num = Integer.parseInt(br.readLine());
-            if (num > 0) {
-                positive_pq.offer(num);
+            if (num > 1) {
+                pos.add(num);
+
+            } else if (num == 0) {
+                zero++;
+            } else if (num == 1) {
+                one++;
             } else {
-                negative_pq.offer(num);
+                neg.add(num);
             }
         }
-
+        Collections.sort(pos, Collections.reverseOrder());
+        Collections.sort(neg);
         int res = 0;
 
-        while (negative_pq.size() > 1) {
-            int o1 = negative_pq.poll();
-            int o2 = negative_pq.poll();
-            if (o1 < 0 && o2 < 0) {
-                res += o1 * o2;
-            } else if (o1 < 0 && o2 == 0) {
-                break;
+        int i = 0;
+        int pos_size = pos.size();
+        while (i + 1 < pos_size) {
+            res += pos.get(i) * pos.get(i + 1);
+            i += 2;
+        }
+        if (i < pos_size) {
+            res += pos.get(i);
+        }
+
+        i = 0;
+        int neg_size = neg.size();
+        while (i + 1 < neg_size) {
+            res += neg.get(i) * neg.get(i + 1);
+            i += 2;
+        }
+        if (i < neg_size) {
+            if (zero == 0) {
+                res+=neg.get(i);
             }
-
         }
-        while (!negative_pq.isEmpty()) {
-            res += negative_pq.poll();
-        }
-
-        while (positive_pq.size() > 1) {
-            int o1 = positive_pq.poll();
-            int o2 = positive_pq.poll();
-            if (o1 == 1 || o2 == 1) {
-                res += o1 + o2;
-            } else {
-                res += o1 * o2;
-            }
-
-        }
-        while (!positive_pq.isEmpty()) {
-            res+=positive_pq.poll();
-        }
-
+        res+=one;
         System.out.println(res);
 
     }
