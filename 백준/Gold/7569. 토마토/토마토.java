@@ -2,76 +2,76 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	
-	static int m, n, h;
-	static int[][][] arr;
-	static int[] dx = {-1, 1, 0, 0, 0, 0};
-	static int[] dy = {0, 0, -1, 1, 0, 0};
-	static int[] dh = {0, 0, 0, 0, 1, -1};
-	static Queue<int[]> q = new ArrayDeque<>();
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		StringBuilder sb = new StringBuilder();
-		
-		st = new StringTokenizer(br.readLine());
-		m = Integer.parseInt(st.nextToken());
-		n = Integer.parseInt(st.nextToken());
-		h = Integer.parseInt(st.nextToken());
-		
-		arr = new int[h][n][m];
-		
-		for(int i = 0; i<h; i++) {
-			for(int j = 0; j<n; j++) {
-				st = new StringTokenizer(br.readLine());
-				for(int k = 0; k<m; k++) {
-					arr[i][j][k] = Integer.parseInt(st.nextToken());
-					if(arr[i][j][k] == 1) q.offer(new int[] {j,k,i});
-				}
-			}
-		}
-		
-		bfs();
-		
-		int result = Integer.MIN_VALUE;
-		for(int i = 0; i<h; i++) {
-			for(int j = 0; j<n; j++) {
-				for(int k = 0; k<m; k++) {
-					if(arr[i][j][k] == 0) {
-						System.out.println(-1);
-						System.exit(0);
-					}
-					if(arr[i][j][k] > result) {
-						result = arr[i][j][k];
-					}
-				}
-			}
-		}
-		System.out.println(result-1);
-		
+    static int R, C, H;
+    static int[][][] box;
 
-	}
-	
-	static void bfs() {
-		
-		while(!q.isEmpty()) {
-			int[] now = q.poll();
-			int now_x = now[0];
-			int now_y = now[1];
-			int now_h = now[2];
-			
-			for(int i = 0; i<6; i++) {
-				int nx = now_x + dx[i];
-				int ny = now_y + dy[i];
-				int nh = now_h + dh[i];
-				
-				if(nx < 0 || ny < 0 || nh < 0 || nx >= n || ny >= m || nh >= h) continue;
-				if(arr[nh][nx][ny] != 0) continue;
-				
-				arr[nh][nx][ny] = arr[now_h][now_x][now_y]+1;
-				q.offer(new int[] {nx, ny, nh});
-			}
-		}
-	}
+    static class Node {
+        int r, c, h, day;
+        Node(int r, int c, int h, int day) {
+            this.r = r; this.c = c; this.h = h; this.day = day;
+        }
+    }
 
+    // 6방향: 상하좌우 + 위/아래
+    static final int[] dr = {-1, 1, 0, 0, 0, 0};
+    static final int[] dc = {0, 0, -1, 1, 0, 0};
+    static final int[] dh = {0, 0, 0, 0, 1, -1};
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        C = Integer.parseInt(st.nextToken()); // M(가로)
+        R = Integer.parseInt(st.nextToken()); // N(세로)
+        H = Integer.parseInt(st.nextToken()); // H(높이)
+
+        box = new int[R][C][H];
+        ArrayDeque<Node> q = new ArrayDeque<>();
+
+        int unripe = 0; // 안 익은 토마토 개수
+
+        for (int h = 0; h < H; h++) {
+            for (int r = 0; r < R; r++) {
+                st = new StringTokenizer(br.readLine());
+                for (int c = 0; c < C; c++) {
+                    int v = Integer.parseInt(st.nextToken());
+                    box[r][c][h] = v;
+                    if (v == 1) {
+                        q.offer(new Node(r, c, h, 0)); // 시작점(이미 익은 토마토)
+                    } else if (v == 0) {
+                        unripe++;
+                    }
+                }
+            }
+        }
+
+        // 시작부터 전부 익어 있으면 0
+        if (unripe == 0) {
+            System.out.println(0);
+            return;
+        }
+
+        int answer = 0;
+
+        while (!q.isEmpty()) {
+            Node cur = q.poll();
+            // 현재까지의 일수 기록(가장 늦게 익은 토마토의 day)
+            answer = Math.max(answer, cur.day);
+
+            for (int d = 0; d < 6; d++) {
+                int nr = cur.r + dr[d];
+                int nc = cur.c + dc[d];
+                int nh = cur.h + dh[d];
+                if (nr < 0 || nc < 0 || nh < 0 || nr >= R || nc >= C || nh >= H) continue;
+                if (box[nr][nc][nh] == 0) {
+                    box[nr][nc][nh] = 1; // 익힘 표시(방문 표시 겸용)
+                    unripe--;
+                    q.offer(new Node(nr, nc, nh, cur.day + 1));
+                }
+            }
+        }
+
+        // 다 익혔는지 최종 확인
+        System.out.println(unripe == 0 ? answer : -1);
+    }
 }
