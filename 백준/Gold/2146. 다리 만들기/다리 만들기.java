@@ -1,106 +1,107 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
+    
+    static int arr[][] ;
+    static int area[][];
+    static boolean [][]visited;
 
-    static int N;
-    static int[][] map;
-    static int[][] owner; // 어떤 섬에서 확장된 칸인지
-    static int[][] dist;  // 해당 섬에서 바다를 몇 칸 건너왔는지
+    static int N,area_num;
 
-    static int[] dr = {-1, 1, 0, 0};
-    static int[] dc = {0, 0, -1, 1};
-
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws IOException{
+        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
 
-        map = new int[N][N];
-        owner = new int[N][N];
-        dist = new int[N][N];
-
-        for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-                dist[i][j] = -1;
+        arr = new int[N][N];
+        area = new int[N][N];
+        
+        StringTokenizer st;
+        area_num=1;
+        for(int i=0; i<N; i++){
+            st = new StringTokenizer(br.readLine());
+            for(int j=0; j<N; j++){
+                arr[i][j]=Integer.parseInt(st.nextToken());
             }
         }
 
-        int islandNum = 1;
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++){
+                if(arr[i][j]==1&&area[i][j]==0){
+                    area_bfs(i, j);
+                }
+            }
+        }
+        
 
-        // 1. 섬 번호 붙이기
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (map[i][j] == 1 && owner[i][j] == 0) {
-                    labelIsland(i, j, islandNum++);
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++){
+                if(arr[i][j]==1){
+                    bfs(i, j);
                 }
             }
         }
 
-        // 2. 모든 육지를 시작점으로 multi-source BFS
-        ArrayDeque<int[]> q = new ArrayDeque<>();
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (owner[i][j] > 0) {
-                    q.offer(new int[]{i, j});
-                    dist[i][j] = 0;
-                }
-            }
-        }
+        System.out.println(min);
 
-        int answer = Integer.MAX_VALUE;
-
-        while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            int r = cur[0];
-            int c = cur[1];
-
-            for (int d = 0; d < 4; d++) {
-                int nr = r + dr[d];
-                int nc = c + dc[d];
-
-                if (nr < 0 || nc < 0 || nr >= N || nc >= N) continue;
-
-                // 아직 아무 섬도 도달하지 않은 바다라면 확장
-                if (owner[nr][nc] == 0) {
-                    owner[nr][nc] = owner[r][c];
-                    dist[nr][nc] = dist[r][c] + 1;
-                    q.offer(new int[]{nr, nc});
-                }
-                // 이미 다른 섬이 확장한 곳과 만났다면 다리 길이 갱신
-                else if (owner[nr][nc] != owner[r][c]) {
-                    answer = Math.min(answer, dist[nr][nc] + dist[r][c]);
-                }
-            }
-        }
-
-        System.out.println(answer);
     }
-
-    static void labelIsland(int sr, int sc, int num) {
+    static int []dr={-1,1,0,0};
+    static int []dc={0,0,-1,1};
+    static void area_bfs(int r, int c){
         ArrayDeque<int[]> q = new ArrayDeque<>();
-        q.offer(new int[]{sr, sc});
-        owner[sr][sc] = num;
-
+        q.offer(new int[]{r,c});
+        area[r][c]=area_num;
         while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            int r = cur[0];
-            int c = cur[1];
+            int []cur = q.poll();
+            for(int i=0; i<4; i++){
+                int nr = cur[0]+dr[i];
+                int nc = cur[1]+dc[i];
 
-            for (int d = 0; d < 4; d++) {
-                int nr = r + dr[d];
-                int nc = c + dc[d];
-
-                if (nr < 0 || nc < 0 || nr >= N || nc >= N) continue;
-                if (map[nr][nc] == 1 && owner[nr][nc] == 0) {
-                    owner[nr][nc] = num;
-                    q.offer(new int[]{nr, nc});
+                if(nr<0 || nc<0 || nr>=N|| nc>=N||arr[nr][nc]==0) continue;
+                if(area[nr][nc]==0){
+                    area[nr][nc]=area_num;
+                    q.add(new int[]{nr,nc});
                 }
             }
+            
         }
+
+        area_num++;
+    }
+    
+
+    static int min = Integer.MAX_VALUE;
+    static void bfs(int r,int c){
+        visited = new boolean[N][N];
+        int this_area = area[r][c];
+        visited[r][c]=true;
+        ArrayDeque<int[]> q = new ArrayDeque<>();
+        q.offer(new int[]{r,c,0});
+        
+        while (!q.isEmpty()) {
+            
+            int []cur = q.poll();
+            for(int i=0; i<4; i++){
+                int nr = cur[0]+dr[i];
+                int nc = cur[1]+dc[i];
+                if(nr<0 || nc<0 || nr>=N|| nc>=N||visited[nr][nc]) continue;
+                if(arr[nr][nc]==0){
+                    visited[nr][nc]=true;
+                    q.offer(new int[]{nr,nc,cur[2]+1});
+                }
+                if(arr[nr][nc]==1 && area[nr][nc]!=this_area){
+                    min = Math.min(min,cur[2]);
+                    return;
+                }
+
+            }
+            
+        }
+        
     }
 }
